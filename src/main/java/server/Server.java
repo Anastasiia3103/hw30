@@ -109,12 +109,23 @@ public class Server {
         }
 
         private void handleFileCommand(String command) {
-            String filePath = command.substring(FILE_COMMAND.length()).trim();
-            // TODO: Implement file handling logic
-        }
-    }
 
-    public static void main(String[] args) {
+            String filePath = command.substring(FILE_COMMAND.length()).trim();
+            sendMessage("File received successfully.");
+
+            try (BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(filePath))) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = reader.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        public static void main(String[] args) {
         Server server = new Server();
         server.start();
     }

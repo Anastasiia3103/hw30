@@ -34,7 +34,8 @@ public class Server {
                 broadcastMessage("[SERVER] " + clientHandler.getClientName() + " connected successfully.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Server.class.getName());
+            logger.log(Level.SEVERE, "Error occurred while starting the server.", e);
         }
     }
 
@@ -45,14 +46,13 @@ public class Server {
                 client.disconnect();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Server.class.getName());
+            logger.log(Level.SEVERE, "Error occurred while stopping the server.", e);
         }
     }
 
-    private void broadcastMessage(String message) {
-        for (ClientHandler client : clients) {
-            client.sendMessage(message);
-        }
+    private void broadcastMessage(String message, ClientHandler client) {
+        client.sendMessage(message);
     }
 
     private class ClientHandler extends Thread {
@@ -86,11 +86,12 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger(ClientHandler.class.getName());
+                logger.log(Level.SEVERE, "Error occurred while running the client handler.", e);
             } finally {
                 disconnect();
                 clients.remove(this);
-                broadcastMessage("[SERVER] " + clientName + " disconnected.");
+                broadcastMessage("[SERVER] " + clientName + " disconnected.", this);
             }
         }
 
@@ -104,12 +105,12 @@ public class Server {
                 writer.close();
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger(Client.class.getName());
+                logger.log(Level.SEVERE, "Error occurred while disconnecting from the server.", e);
             }
         }
 
         private void handleFileCommand(String command) {
-
             String filePath = command.substring(FILE_COMMAND.length()).trim();
             sendMessage("File received successfully.");
 
@@ -120,7 +121,8 @@ public class Server {
                     fileOutputStream.write(buffer, 0, bytesRead);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger(Server.class.getName());
+                logger.log(Level.SEVERE, "Error occurred while handling the file command.", e);
             }
         }
 

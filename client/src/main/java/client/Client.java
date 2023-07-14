@@ -3,6 +3,8 @@ package client;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client {
 
@@ -20,7 +22,8 @@ public class Client {
             writer = new PrintWriter(socket.getOutputStream(), true);
             startMessageReader();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Client.class.getName());
+            logger.log(Level.SEVERE, "Error occurred while connecting to the server.", e);
         }
     }
 
@@ -29,7 +32,8 @@ public class Client {
             writer.println("-exit");
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Client.class.getName());
+            logger.log(Level.SEVERE, "Error occurred while disconnecting from the server.", e);
         }
     }
 
@@ -38,14 +42,15 @@ public class Client {
     }
 
     private void startMessageReader() {
+        Logger logger = Logger.getLogger(Client.class.getName());
         new Thread(() -> {
             try {
                 String serverMessage;
                 while ((serverMessage = reader.readLine()) != null) {
-                    System.out.println(serverMessage);
+                    logger.log(Level.INFO, serverMessage);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Error occurred while reading the message from the server.", e);
             }
         }).start();
     }
